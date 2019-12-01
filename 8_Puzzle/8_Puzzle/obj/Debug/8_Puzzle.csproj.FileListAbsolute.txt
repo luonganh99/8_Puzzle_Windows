@@ -1,0 +1,15 @@
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\8_Puzzle.csprojAssemblyReference.cache
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\MainWindow.g.cs
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\App.g.cs
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\8_Puzzle_MarkupCompile.cache
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\8_Puzzle_MarkupCompile.lref
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\bin\Debug\8_Puzzle.exe.config
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\bin\Debug\8_Puzzle.exe
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\bin\Debug\8_Puzzle.pdb
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\MainWindow.baml
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\8_Puzzle.g.resources
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\_8_Puzzle.Properties.Resources.resources
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\8_Puzzle.csproj.GenerateResource.cache
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\8_Puzzle.csproj.CoreCompileInputs.cache
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\8_Puzzle.exe
+E:\WPF\8_Puzzle_Windows\8_Puzzle\8_Puzzle\obj\Debug\8_Puzzle.pdb

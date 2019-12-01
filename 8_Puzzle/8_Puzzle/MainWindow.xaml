@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_8_Puzzle"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="450" Width="800"
+        MouseMove="Window_MouseMove"
+       >
+    <Canvas x:Name="canvas">
+        <Image x:Name="previewImage" MouseLeftButtonUp="previewImage_MouseLeftButtonUp"/>
+        <Button x:Name="btnPickPicture" Click="BtnPickPicture_Click" Content="Chọn ảnh" RenderTransformOrigin="0.295,-0.038"/>
+    </Canvas>
 </Window>
