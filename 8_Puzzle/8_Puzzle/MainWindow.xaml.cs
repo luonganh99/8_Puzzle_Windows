@@ -87,7 +87,7 @@ namespace _8_Puzzle
                             var h = (int)source.Height;
                             var w = (int)source.Width;
                            
-                            var rect = new Int32Rect(j * (w / 3), i * (h / 3), w / 3, h / 3);
+                            var rect = new Int32Rect(i * (w / 3), j * (h / 3), w / 3, h / 3);
                             var cropBitmap = new CroppedBitmap(source,
                                 rect);
 
@@ -122,20 +122,21 @@ namespace _8_Puzzle
             int y = (int)(position.Y - startY) / (height + 2) * (height + 2) + startY;
             var (iblank, jblank) = _blank;
             var image = sender as Image;
-            int i = (int)(position.X - startX) / (width+2);
-            int j = (int)(position.Y - startY) / (height+2);
+            int j = (int)(position.X - startX) / (width+2);
+            int i = (int)(position.Y - startY) / (height+2);
             var (iold, jold) = _selectedBitmap.Tag as Tuple<int, int>;
-            if (i == iblank && j == jblank)
+            if (i == iblank && j == jblank && i<3 && j<3 &&((iold==i+1 && jold==j) || (iold==i-1 && jold==j) || (iold==i && jold==j+1) || (iold==i && jold==j-1)))
             {
 
                 Canvas.SetLeft(_selectedBitmap, x);
                 Canvas.SetTop(_selectedBitmap, y);
                 _blank = _selectedBitmap.Tag as Tuple<int, int>;
+                _selectedBitmap.Tag = new Tuple<int, int>(i, j);
             }
             else
             {
-                Canvas.SetLeft(_selectedBitmap, (int)iold*(width+2)+ startX);
-                Canvas.SetTop(_selectedBitmap, (int)jold*(height+2)+startY);
+                Canvas.SetTop(_selectedBitmap, (int)(iold * (height + 2) + startY));
+                Canvas.SetLeft(_selectedBitmap, (int)(jold * (width + 2) + startX));
             }
 
             
