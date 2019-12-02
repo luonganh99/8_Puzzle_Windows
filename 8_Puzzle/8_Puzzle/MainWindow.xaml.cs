@@ -62,7 +62,7 @@ namespace _8_Puzzle
         {
 
         }
-
+        Tuple<int, int> _blank =new Tuple<int, int>(2,2);
         private void BtnPickPicture_Click(object sender, RoutedEventArgs e)
         {
             var screen = new OpenFileDialog();
@@ -120,11 +120,26 @@ namespace _8_Puzzle
 
             int x = (int)(position.X - startX) / (width + 2) * (width + 2) + startX;
             int y = (int)(position.Y - startY) / (height + 2) * (height + 2) + startY;
-
-            Canvas.SetLeft(_selectedBitmap, x);
-            Canvas.SetTop(_selectedBitmap, y);
+            var (iblank, jblank) = _blank;
             var image = sender as Image;
-            var (i, j) = image.Tag as Tuple<int, int>;
+            int i = (int)(position.X - startX) / (width+2);
+            int j = (int)(position.Y - startY) / (height+2);
+            var (iold, jold) = _selectedBitmap.Tag as Tuple<int, int>;
+            if (i == iblank && j == jblank)
+            {
+
+                Canvas.SetLeft(_selectedBitmap, x);
+                Canvas.SetTop(_selectedBitmap, y);
+                _blank = _selectedBitmap.Tag as Tuple<int, int>;
+            }
+            else
+            {
+                Canvas.SetLeft(_selectedBitmap, (int)iold*(width+2)+ startX);
+                Canvas.SetTop(_selectedBitmap, (int)jold*(height+2)+startY);
+            }
+
+            
+            
             
         }
 
