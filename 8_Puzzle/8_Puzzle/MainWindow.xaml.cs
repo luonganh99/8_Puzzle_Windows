@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Gma.System.MouseKeyHook;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,43 +27,24 @@ namespace _8_Puzzle
         const int startY = 30;
         const int width = 75;
         const int height = 100;
+        Tuple<int, int> _blank = new Tuple<int, int>(2, 2);
+        bool _isDragging = false;
+        Image _selectedBitmap = null;
+        Point _lastPosition;
+        Image[,] _cropImage = new Image[3,3];
         public MainWindow()
         {
             InitializeComponent();
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    var line1 = new Line();
-            //    line1.StrokeThickness = 1;
-            //    line1.Stroke = new SolidColorBrush(Colors.Black);
-            //    canvas.Children.Add(line1);
-
-            //    line1.X1 = startX + i * width;
-            //    line1.Y1 = startY;
-
-            //    line1.X2 = startX + i * width;
-            //    line1.Y2 = startY + 3 * height;
-            //}
-
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    var line2 = new Line();
-            //    line2.StrokeThickness = 1;
-            //    line2.Stroke = new SolidColorBrush(Colors.Black);
-            //    canvas.Children.Add(line2);
-
-            //    line2.X1 = startX;
-            //    line2.Y1 = startY + i * height;
-
-            //    line2.X2 = startX + 3 * width;
-            //    line2.Y2 = startY + i * height;
-            //}
+            //Dang ky su kien hook
+            
+          
         }
-
+       
         private void previewImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
 
         }
-        Tuple<int, int> _blank =new Tuple<int, int>(2,2);
+      
         private void BtnPickPicture_Click(object sender, RoutedEventArgs e)
         {
             var screen = new OpenFileDialog();
@@ -103,6 +85,8 @@ namespace _8_Puzzle
 
                             cropImage.MouseLeftButtonDown += CropImage_MouseLeftButtonDown;
                             cropImage.PreviewMouseLeftButtonUp += CropImage_PreviewMouseLeftButtonUp;
+                            _cropImage[i,j]=cropImage;
+                            //cropImage.KeyUp += CropImage_KeyUp;
                             cropImage.Tag = new Tuple<int, int>(i, j);
                         }
                     }
@@ -110,9 +94,85 @@ namespace _8_Puzzle
             }
 
         }
-        bool _isDragging = false;
-        Image _selectedBitmap = null;
-        Point _lastPosition;
+        //Bắt phim bấm arrow key
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            var (iblank, jblank) = _blank as Tuple<int, int>;
+
+            Image image;
+            int iImage, jImage;
+            switch (e.Key)
+            {
+                case Key.Left:
+                    if (jblank == 2 ) break;
+                    image = _cropImage[iblank , jblank + 1];                   
+                    (iImage, jImage) = image.Tag as Tuple<int, int>;
+                
+                    if (jImage - 1 == jblank)
+                    {
+                        Canvas.SetTop(image, (int)(iblank * (height + 2) + startY));
+                        Canvas.SetLeft(image, (int)(jblank * (width + 2) + startX));
+                        _blank = new Tuple<int, int>(iImage, jImage);
+                        _cropImage[iblank, jblank] = image;
+                        _cropImage[iblank, jblank].Tag = new Tuple<int, int>(iblank, jblank);
+                        _cropImage[iImage, jImage] = null;
+                    }
+                    break;
+                case Key.Right:
+                    if (jblank == 0) break;
+                    image = _cropImage[iblank, jblank -1];
+                    (iImage, jImage) = image.Tag as Tuple<int, int>;
+
+                    if (jImage + 1 == jblank)
+                    {
+                        Canvas.SetTop(image, (int)(iblank * (height + 2) + startY));
+                        Canvas.SetLeft(image, (int)(jblank * (width + 2) + startX));
+                        _blank = new Tuple<int, int>(iImage, jImage);
+                        _cropImage[iblank, jblank] = image;
+                        _cropImage[iblank, jblank].Tag = new Tuple<int, int>(iblank, jblank);
+                        _cropImage[iImage, jImage] = null;
+                    }
+                    break;
+                
+                case Key.Up:
+                    if (iblank ==2) break;
+                    image = _cropImage[iblank+1, jblank];
+                    (iImage, jImage) = image.Tag as Tuple<int, int>;
+
+                    if (iImage - 1 == iblank)
+                    {
+                        Canvas.SetTop(image, (int)(iblank * (height + 2) + startY));
+                        Canvas.SetLeft(image, (int)(jblank * (width + 2) + startX));
+                        _blank = new Tuple<int, int>(iImage, jImage);
+                        _cropImage[iblank, jblank] = image;
+                        _cropImage[iblank, jblank].Tag = new Tuple<int, int>(iblank,jblank);
+                        _cropImage[iImage, jImage] = null;
+
+                    }
+                    break;
+                case Key.Down:
+                    if (iblank == 0 ) break;
+                    image = _cropImage[iblank - 1, jblank];
+                    (iImage, jImage) = image.Tag as Tuple<int, int>;
+
+                    if (iImage + 1 == iblank)
+                    {
+                        Canvas.SetTop(image, (int)(iblank * (height + 2) + startY));
+                        Canvas.SetLeft(image, (int)(jblank * (width + 2) + startX));
+                        _blank = new Tuple<int, int>(iImage, jImage);
+                        _cropImage[iblank, jblank] = image;
+                        _cropImage[iblank, jblank].Tag = new Tuple<int, int>(iblank, jblank);
+                        _cropImage[iImage, jImage] = null;
+                    }
+                    break;
+                default:
+                    break;
+
+            }
+        }
+        //bắt kéo thả
+
+      
         private void CropImage_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             _isDragging = false;
@@ -132,6 +192,8 @@ namespace _8_Puzzle
                 Canvas.SetTop(_selectedBitmap, y);
                 _blank = _selectedBitmap.Tag as Tuple<int, int>;
                 _selectedBitmap.Tag = new Tuple<int, int>(i, j);
+                _cropImage[iblank, jblank] = _selectedBitmap;
+                _cropImage[iold, jold] = null;
             }
             else
             {
