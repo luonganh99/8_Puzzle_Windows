@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Gma.System.MouseKeyHook;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,212 +25,203 @@ namespace _8_Puzzle
     /// </summary>
     public partial class MainWindow : Window
     {
+        const int MAX = 9;
         const int startX = 30;
         const int startY = 30;
         const int width = 75;
         const int height = 100;
-        const int MAX = 9;
-        int[] chess = new int[] {0,1,2,3,4,5,6,7,8};
+ 
+        // Mảng lưu trữ trạng thái của game, mỗi hình ảnh khi mới khởi tạo được đánh số từ 0 -> 8
+        // Vd: 
+        // 0 1 2
+        // 3 4 5
+        // 6 7 8
+        int[] _chess = new int[] {0,1,2,3,4,5,6,7,8};
+
         bool _isDragging = false;
         Image _selectedBitmap = null;
         Point _lastPosition;
-        Point _lastUsePosition;
-        String filename = "";
-        DispatcherTimer dt = new DispatcherTimer();
-        int decrement = 100;
-        int m, s;
-        Image[] cropImages = new Image[8];
+
+        Tuple<int, int> _blank = new Tuple<int, int>(0, 0); //Vị trí ô trống 
+        Image[,] _cropImage = new Image[3, 3]; //Mảng 2 chiều các mảng hình ảnh
+
+        DispatcherTimer _timer = new DispatcherTimer();
+        int _decrement = 100;
+        int _min;
+        int _sec;
+
+        String _fileName = "";
 
         public MainWindow()
         {
             InitializeComponent();
-            for (int i = 0; i < 8; i++)
-            {
-                cropImages[i] = new Image();
-            }
         }
-        private void previewImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
 
-        }
-        private void BtnPickPicture_Click(object sender, RoutedEventArgs e)
+        //Chọn hình ảnh và tạo Game
+        private void btnSelectPicture_Click(object sender, RoutedEventArgs e)
         {
             var screen = new OpenFileDialog();
             if (screen.ShowDialog()==true)
             {
-                //Tạo random chess
+                //Tạo random _chess
                 do
                 {
-                    chess = randomChess(chess);
-                } while (!isSolvable(chess));
-                filename = screen.FileName;
-                createGame(filename);
+                    _chess = randomChess(_chess);
+                } while (!isSolvable(_chess)); //random _chess có thể giải được
+                _fileName = screen.FileName;
+                createGame(_fileName);
             }
         }
-        private void createGame(string filename)
+        
+        //Di chuyển bằng phím mũi tên
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            var source = new BitmapImage(
-            new Uri(filename, UriKind.Absolute));
-
-            previewImage.Width = 3 * width;
-            previewImage.Height = 3 * height;
-            previewImage.Source = source;
-
-            Canvas.SetLeft(previewImage, 400);
-            Canvas.SetTop(previewImage, 30);
-            int count = 0;
-            // Bat dau cat thanh 9 manh
-            for (int i = 0; i < 3; i++)
+            var (iblank, jblank) = _blank as Tuple<int, int>;
+            int k = 3 * iblank + jblank;
+            int kold;
+            Image image;
+            int iImage, jImage;
+            switch (e.Key)
             {
-                for (int j = 0; j < 3; j++)
-                {
-                    if (!((i == 2) && (j == 2)))
+                case Key.Left:
+                    if (jblank == 2 ) break;
+
+                    image = _cropImage[iblank , jblank + 1];                   
+                    (iImage, jImage) = image.Tag as Tuple<int, int>;
+                    kold = 3 * iImage + jImage;
+                    if (jImage - 1 == jblank)
                     {
-                        var h = (int)source.Height;
-                        var w = (int)source.Width;
+                        //Cập nhật giao diện
+                        Canvas.SetTop(image, (int)(iblank * (height + 2) + startY));
+                        Canvas.SetLeft(image, (int)(jblank * (width + 2) + startX));
 
-                        var rect = new Int32Rect(j * (w / 3), i * (h / 3), w / 3, h / 3); //x,y,width,height
-                        var cropBitmap = new CroppedBitmap(source, rect);
+                        //Cập nhật model
+                        _blank = new Tuple<int, int>(iImage, jImage);
+                        _cropImage[iblank, jblank] = image;
+                        _cropImage[iblank, jblank].Tag = new Tuple<int, int>(iblank, jblank);
+                        _cropImage[iImage, jImage] = null;
+                        _chess[k] = _chess[kold];
+                        _chess[kold] = 8;
 
-                        cropImages[count] = new Image();
 
-                        cropImages[count].Stretch = Stretch.Fill;
-                        cropImages[count].Width = width;
-                        cropImages[count].Height = height;
-                        cropImages[count].Source = cropBitmap;
-                        canvas.Children.Add(cropImages[count]);
-
-                        cropImages[count].Tag = new Tuple<int, int>(i, j);
-                        //Random
-                        //Đổi i,j -> vị trí nào(k) trong mảng một chiều chess
-                        int k = 3 * i + j;
-
-                        //Kiểm tra k ở đâu trong chess đã random
-                        int index;
-                        for (index = 0; index < MAX; index++)
-                        {
-                            if (k == chess[index])
-                            {
-                                break;
-                            }
-                        }
-                        //Lấy vị trí có k trong chess (là index) đổi qua 2 chiều m,n . Đây là vị trí ảo để set lên giao diện
-                        int m = index / 3;
-                        int n = index % 3;
-
-                        Canvas.SetLeft(cropImages[count], startX + n * (width + 2));
-                        Canvas.SetTop(cropImages[count], startY + m * (height + 2));
-
-                        cropImages[count].MouseLeftButtonDown += CropImage_MouseLeftButtonDown;
-                        cropImages[count].PreviewMouseLeftButtonUp += CropImage_PreviewMouseLeftButtonUp;
-                        count++;
                     }
-                }
-            }
+                    break;
+                case Key.Right:
+                    if (jblank == 0) break;
+                    image = _cropImage[iblank, jblank -1];
+                    (iImage, jImage) = image.Tag as Tuple<int, int>;
+                    kold = 3 * iImage + jImage;
 
-            dt.Interval = TimeSpan.FromSeconds(1);
-            dt.Tick += dtTicker;
-            dt.Start();
-        }
-        private int[] randomChess(int[] chess)
-        {
-            Random rnd = new Random();
-            for(int i = 0; i< MAX; i++)
-            {
-                int j;
-                do
-                {
-                    j = rnd.Next(MAX);
-                } while (i == j);
-                int temp = chess[i];
-                chess[i] = chess[j];
-                chess[j] = temp;
+                    if (jImage + 1 == jblank)
+                    {
+                        Canvas.SetTop(image, (int)(iblank * (height + 2) + startY));
+                        Canvas.SetLeft(image, (int)(jblank * (width + 2) + startX));
+                        _blank = new Tuple<int, int>(iImage, jImage);
+                        _cropImage[iblank, jblank] = image;
+                        _cropImage[iblank, jblank].Tag = new Tuple<int, int>(iblank, jblank);
+                        _cropImage[iImage, jImage] = null;
+                        _chess[k] = _chess[kold];
+                        _chess[kold] = 8;
+                    }
+                    break;
+                
+                case Key.Up:
+                    if (iblank ==2) break;
+                    image = _cropImage[iblank+1, jblank];
+                    (iImage, jImage) = image.Tag as Tuple<int, int>;
+                    kold = 3 * iImage + jImage;
+
+                    if (iImage - 1 == iblank)
+                    {
+                        Canvas.SetTop(image, (int)(iblank * (height + 2) + startY));
+                        Canvas.SetLeft(image, (int)(jblank * (width + 2) + startX));
+                        _blank = new Tuple<int, int>(iImage, jImage);
+                        _cropImage[iblank, jblank] = image;
+                        _cropImage[iblank, jblank].Tag = new Tuple<int, int>(iblank,jblank);
+                        _cropImage[iImage, jImage] = null;
+                        _chess[k] = _chess[kold];
+                        _chess[kold] = 8;
+                    }
+                    break;
+                case Key.Down:
+                    if (iblank == 0 ) break;
+                    image = _cropImage[iblank - 1, jblank];
+                    (iImage, jImage) = image.Tag as Tuple<int, int>;
+                    kold = 3 * iImage + jImage;
+
+                    if (iImage + 1 == iblank)
+                    {
+                        Canvas.SetTop(image, (int)(iblank * (height + 2) + startY));
+                        Canvas.SetLeft(image, (int)(jblank * (width + 2) + startX));
+                        _blank = new Tuple<int, int>(iImage, jImage);
+                        _cropImage[iblank, jblank] = image;
+                        _cropImage[iblank, jblank].Tag = new Tuple<int, int>(iblank, jblank);
+                        _cropImage[iImage, jImage] = null;
+                        _chess[k] = _chess[kold];
+                        _chess[kold] = 8;
+                    }
+                    break;
+                default:
+                    break;
             }
-            return chess;
-        }
-        private bool isSolvable(int[] chess)
-        {
-            int number_of_inv = 0;
-            for (int i = 0; i < MAX; i++)
+            if (checkWin())
             {
-                for (int j = i + 1; j < MAX; j++)
-                {
-                    if (chess[i] > chess[j]) 
-                        number_of_inv++;
-                }
+                MessageBox.Show("You won!");
+                _timer.Stop();
+                this.Close();
             }
-            return (number_of_inv % 2 == 0);
         }
+
+        //Di chuyển bằng kéo thả chuột
         private void CropImage_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             _isDragging = false;
             var position = e.GetPosition(this);
 
+            int x = (int)(position.X - startX) / (width + 2) * (width + 2) + startX;
+            int y = (int)(position.Y - startY) / (height + 2) * (height + 2) + startY;
+
+            var (iblank, jblank) = _blank;
             var image = sender as Image;
-
-            //Lấy vị trí hiện tại giao diện của image
-            int i = ((int)position.Y - startY) / height;
-            int j = ((int)position.X - startX) / width;
-
-            //Lấy vị trí cũ 
-            int i_last = ((int)_lastUsePosition.Y - startY) / height;
-            int j_last = ((int)_lastUsePosition.X -startX) / width;
-
-            //Chuyển vị trí i,j sang vị trí k trong chess 
+            int j = (int)(position.X - startX) / (width+2);
+            int i = (int)(position.Y - startY) / (height+2);
+            var (iold, jold) = _selectedBitmap.Tag as Tuple<int, int>;
             int k = 3 * i + j;
-            int k_last = 3 * i_last + j_last;
-
-            //Cập nhật chess 
-            if( k>=0 && k <= 8)
+            int kold = 3 * iold + jold;
+            if (i == iblank && j == jblank && i<3 && j<3 &&((iold==i+1 && jold==j) || (iold==i-1 && jold==j) || (iold==i && jold==j+1) || (iold==i && jold==j-1)))
             {
-                if (chess[k] == 8 && (k == k_last + 1 || k == k_last - 1 || k == k_last + 3 || k == k_last - 3))
+                _chess[k] = _chess[kold];
+                _chess[kold] = 8;
+                Canvas.SetLeft(_selectedBitmap, x);
+                Canvas.SetTop(_selectedBitmap, y);
+                _blank = _selectedBitmap.Tag as Tuple<int, int>;
+                _selectedBitmap.Tag = new Tuple<int, int>(i, j);
+                _cropImage[iblank, jblank] = _selectedBitmap;
+                _cropImage[iold, jold] = null;
+                if (checkWin())
                 {
-                    chess[k] = chess[k_last];
-                    chess[k_last] = 8;
-
-                    int x = (int)(position.X - startX) / (width + 2) * (width + 2) + startX;
-                    int y = (int)(position.Y - startY) / (height + 2) * (height + 2) + startY;
-                    Canvas.SetLeft(_selectedBitmap, x);
-                    Canvas.SetTop(_selectedBitmap, y);
-
-                    //Kiểm tra 
-                    bool check = true;
-                    for (int m = 0; m < MAX; m++)
-                    {
-                        if (chess[m] != m)
-                        {
-                            check = false;
-                        }
-                    }
-
-                    if (check)
-                    {
-                        MessageBox.Show($"Win");
-                        dt.Stop();
-                    }
+                    MessageBox.Show("You won!");
+                    _timer.Stop();
+                    this.Close();
                 }
-                else
-                {
-                    int x = (int)(_lastUsePosition.X - startX) / (width + 2) * (width + 2) + startX;
-                    int y = (int)(_lastUsePosition.Y - startY) / (height + 2) * (height + 2) + startY;
-                    Canvas.SetLeft(_selectedBitmap, x);
-                    Canvas.SetTop(_selectedBitmap, y);
-                }
+                
             }
             else
             {
-                int x = (int)(_lastUsePosition.X - startX) / (width + 2) * (width + 2) + startX;
-                int y = (int)(_lastUsePosition.Y - startY) / (height + 2) * (height + 2) + startY;
-                Canvas.SetLeft(_selectedBitmap, x);
-                Canvas.SetTop(_selectedBitmap, y);
+                Canvas.SetTop(_selectedBitmap, (int)(iold * (height + 2) + startY));
+                Canvas.SetLeft(_selectedBitmap, (int)(jold * (width + 2) + startX));
             }
+
+            
+            
+            
         }
         private void CropImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _isDragging = true;
             _selectedBitmap = sender as Image;
             _lastPosition = e.GetPosition(this);
-            _lastUsePosition = e.GetPosition(this);
+            
         }
         private void Window_MouseMove(object sender, MouseEventArgs e)
         {
@@ -238,7 +230,7 @@ namespace _8_Puzzle
             int i = ((int)position.Y - startY) / height;
             int j = ((int)position.X - startX) / width;
             this.Title = $"{position.X} - {position.Y}, a[{i}][{j}]";
-            if (_isDragging == true && i >= 0 && i < 3 && j >=0 && j <3)
+            if (_isDragging == true)
             {
                 var dx = position.X - _lastPosition.X;
                 var dy = position.Y - _lastPosition.Y;
@@ -251,20 +243,22 @@ namespace _8_Puzzle
                 _lastPosition = position;
             }
         }
+
+        //Lưu và tải Game
         private void btnSaveGame_Click(object sender, RoutedEventArgs e)
         {
             const string fname = "save.txt";
             var writer = new StreamWriter(fname);
             //Lưu địa chỉ hình ảnh
-            writer.WriteLine(filename);
+            writer.WriteLine(_fileName);
 
             //Lưu thời gian đang chơi
-            writer.WriteLine(decrement.ToString());
+            writer.WriteLine(_decrement.ToString());
 
             //Lưu thông tin chess
             for(int i= 0; i < MAX; i++)
             {
-                writer.Write($"{chess[i]} ");
+                writer.Write($"{_chess[i]} ");
             }
             writer.Close();
             MessageBox.Show("Saved Game!");
@@ -280,51 +274,168 @@ namespace _8_Puzzle
                 var reader = new StreamReader(fname);
                 var firstline = reader.ReadLine();
                 var secondline = reader.ReadLine();
-                filename = firstline;
-                decrement = int.Parse(secondline);
+                _fileName = firstline;
+                _decrement = int.Parse(secondline);
                 var tokens = reader.ReadLine().Split(new string[] { " " }, StringSplitOptions.None);
                 for (int i = 0; i < MAX; i++)
                 {
-                    chess[i] = int.Parse(tokens[i]);
+                    _chess[i] = int.Parse(tokens[i]);
                 }
-                createGame(filename);
+                createGame(_fileName);
                 reader.Close();
             }
         }
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-        }
-        private void dtTicker(object sender, EventArgs e)
-        {
-            decrement--;
-            if (decrement < 60)
-            {
-                m = 0;
-                s = decrement;
-            }
-            if(decrement >= 60)
-            {
-                m = decrement / 60;
-                s = decrement - m * 60;
-            }
-            lbTimer.Content = $"{m} : {s}";
-            if (decrement == 0)
-            {
-                MessageBox.Show("You lose !");
-                dt.Stop();
-            }
-        }
 
+        //Các hàm hỗ trợ
+        private void createGame(string filename)
+        {
+            var source = new BitmapImage(new Uri(filename, UriKind.Absolute));
+
+            previewImage.Width = 3 * width;
+            previewImage.Height = 3 * height;
+            previewImage.Source = source;
+
+            Canvas.SetLeft(previewImage, 400);
+            Canvas.SetTop(previewImage, 30);
+
+            // Bắt đầu cắt thành 9 mảnh
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (!((i == 2) && (j == 2)))
+                    {
+                        var h = (int)source.Height;
+                        var w = (int)source.Width;
+
+                        var rect = new Int32Rect(j * (w / 3), i * (h / 3), w / 3, h / 3); 
+                        var cropBitmap = new CroppedBitmap(source, rect);
+
+                        var cropImage = new Image();
+                        cropImage.Stretch = Stretch.Fill;
+                        cropImage.Width = width;
+                        cropImage.Height = height;
+                        cropImage.Source = cropBitmap;
+                        canvas.Children.Add(cropImage);
+
+                        //Kiểm tra vị trí i,j mảnh hình ảnh trong _chess (đã random) và set giao diện tương ứng 
+                        //Đổi i,j -> vị trí k trong mảng một chiều _chess
+                        int k = 3 * i + j;
+
+                        //Kiểm tra k ở đâu trong _chess đã random
+                        int m = 0, n = 0;
+                        for (int index = 0; index < MAX; index++)
+                        {
+                            if (k == _chess[index])
+                            {
+                                //Lấy vị trí có k trong _chess (là index) đổi qua vị trí mảng 2 chiều m,n 
+                                m = index / 3;
+                                n = index % 3;
+                            }
+                        }
+                        //m,n là vị trí mảnh hình ảnh sẽ được set lên giao diện
+                        cropImage.Tag = new Tuple<int, int>(m, n);
+                        Canvas.SetLeft(cropImage, startX + n * (width + 2));
+                        Canvas.SetTop(cropImage, startY + m * (height + 2));
+
+                        cropImage.MouseLeftButtonDown += CropImage_MouseLeftButtonDown;
+                        cropImage.PreviewMouseLeftButtonUp += CropImage_PreviewMouseLeftButtonUp;
+
+                        _cropImage[m, n] = cropImage;
+                    }
+                }
+            }
+
+            // Cập nhật _blank từ _chess
+            for (int index = 0; index < MAX; index++)
+            {
+                if (8 == _chess[index])
+                {
+                    int m = index / 3;
+                    int n = index % 3;
+                    _blank = new Tuple<int, int>(m, n);
+                }
+            }
+
+            _timer.Interval = TimeSpan.FromSeconds(1);
+            _timer.Tick += timerTicker;
+            _timer.Start();
+        }
         private void resetGame()
         {
-            filename = "";
-            previewImage.Source = null;
-            for(int i = 0; i < 8; i++)
+            _fileName = "";
+            canvas.Children.Remove(previewImage);
+            for(int i = 0; i < 3; i++)
             {
-                cropImages[i].Source = null;
+                for(int j = 0; j < 3; j++)
+                {
+                    canvas.Children.Remove(_cropImage[i, j]);
+                }
             }
-            dt.Stop();
+            _timer.Stop();
         }
+        private int[] randomChess(int[] _chess)
+        {
+            Random rnd = new Random();
+            for (int i = 0; i < MAX; i++)
+            {
+                int j;
+                do
+                {
+                    j = rnd.Next(MAX);
+                } while (i == j);
+                int temp = _chess[i];
+                _chess[i] = _chess[j];
+                _chess[j] = temp;
+            }
+            return _chess;
+        }
+        private bool isSolvable(int[] _chess)
+        {
+            int number_of_inv = 0;
+            for (int i = 0; i < MAX; i++)
+            {
+                for (int j = i + 1; j < MAX; j++)
+                {
+                    if (_chess[i] > _chess[j] && _chess[i] != 8 && _chess[j] != 8)
+                        number_of_inv++;
+                }
+            }
+            return (number_of_inv % 2 == 0);
+        }
+        private void timerTicker(object sender, EventArgs e)
+        {
+            _decrement--;
+            if (_decrement < 60)
+            {
+                _min = 0;
+                _sec = _decrement;
+            }
+            if(_decrement >= 60)
+            {
+                _min = _decrement / 60;
+                _sec = _decrement - _min * 60;
+            }
+            lbTimer.Content = $"{_min} : {_sec}";
+            if (_decrement == 0)
+            {
+                MessageBox.Show("You lose !");
+                _timer.Stop();
+            }
+        }
+        private bool checkWin()
+        {
+            //Kiểm tra 
+            bool check = true;
+            for (int i = 0; i < MAX; i++)
+            {
+                if (_chess[i] != i)
+                {
+                    check = false;
+                }
+            }
+            return check;
+        }
+
     }
 }
