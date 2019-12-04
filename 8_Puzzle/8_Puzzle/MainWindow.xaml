@@ -7,9 +7,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         MouseMove="Window_MouseMove"
-       >
+        Loaded="Window_Loaded">
     <Canvas x:Name="canvas">
         <Image x:Name="previewImage" MouseLeftButtonUp="previewImage_MouseLeftButtonUp"/>
-        <Button x:Name="btnPickPicture" Click="BtnPickPicture_Click" Content="Chọn ảnh" RenderTransformOrigin="0.295,-0.038"/>
+        <Button x:Name="btnPickPicture" Click="BtnPickPicture_Click" Content="Select Picture" RenderTransformOrigin="0.295,-0.038"/>
+        <Button x:Name="btnSaveGame" Click="btnSaveGame_Click" Content="Save Game" Canvas.Left="79" />
+        <Button x:Name="btnLoadGame" Click="btnLoadGame_Click" Content="Load Game" Canvas.Left="146" />
+        <Label x:Name="lbTimer" FontSize="20px" RenderTransformOrigin="22.924,1.104" Canvas.Left="309" Canvas.Top="5"/>
     </Canvas>
 </Window>
