@@ -295,8 +295,8 @@ namespace _8_Puzzle
             previewImage.Height = 3 * height;
             previewImage.Source = source;
 
-            Canvas.SetLeft(previewImage, 400);
-            Canvas.SetTop(previewImage, 30);
+            Canvas.SetLeft(previewImage, 430);
+            Canvas.SetTop(previewImage, 20);
 
             // Bắt đầu cắt thành 9 mảnh
             for (int i = 0; i < 3; i++)

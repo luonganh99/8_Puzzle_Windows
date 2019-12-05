@@ -11,10 +11,13 @@
        >
 
     <Canvas x:Name="canvas">
+        <Line X1="300" Y1="30" X2="300" Y2="330" Stroke="Red" StrokeThickness="5"></Line>
+        <Label Content="Preview Image" Canvas.Left="487" Canvas.Top="36"/>
         <Image x:Name="previewImage"/>
-        <Button x:Name="btnPickPicture" Click="btnSelectPicture_Click" Content="Select Picture" RenderTransformOrigin="0.295,-0.038"/>
-        <Button x:Name="btnSaveGame" Click="btnSaveGame_Click" Content="Save Game" Canvas.Left="79" />
-        <Button x:Name="btnLoadGame" Click="btnLoadGame_Click" Content="Load Game" Canvas.Left="146" />
-        <Label x:Name="lbTimer" FontSize="20px" RenderTransformOrigin="22.924,1.104" Canvas.Left="309" Canvas.Top="5"/>
+        <Button x:Name="btnPickPicture" Click="btnSelectPicture_Click" Content="Select Picture" RenderTransformOrigin="0.295,-0.038" Canvas.Left="392" Canvas.Top="302"/>
+        <Button x:Name="btnSaveGame" Click="btnSaveGame_Click" Content="Save Game" Canvas.Left="604" Canvas.Top="302" />
+        <Button x:Name="btnLoadGame" Click="btnLoadGame_Click" Content="Load Game" Canvas.Left="503" Canvas.Top="302" />
+        <Label x:Name="lbTimer" Content="00:00" FontSize="20px" RenderTransformOrigin="22.924,1.104" Canvas.Left="572" Canvas.Top="236"/>
+        <Label x:Name="lbTime" Content="Time Left: " FontSize="20px" RenderTransformOrigin="5.884,11.859" Canvas.Left="440" Canvas.Top="236" />
     </Canvas>
 </Window>
