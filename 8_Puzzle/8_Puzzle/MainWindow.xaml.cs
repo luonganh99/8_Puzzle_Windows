@@ -26,8 +26,8 @@ namespace _8_Puzzle
     public partial class MainWindow : Window
     {
         const int MAX = 9;
-        const int startX = 30;
-        const int startY = 30;
+        const int startX = 50;
+        const int startY = 160;
         const int width = 75;
         const int height = 100;
  
@@ -46,7 +46,9 @@ namespace _8_Puzzle
         Image[,] _cropImage = new Image[3, 3]; //Mảng 2 chiều các mảng hình ảnh
 
         DispatcherTimer _timer = new DispatcherTimer();
-        int _decrement = 100;
+
+        int _decrement = 300;
+
         int _min;
         int _sec;
 
@@ -164,7 +166,8 @@ namespace _8_Puzzle
                 default:
                     break;
             }
-            if (checkWin())
+
+            if (checkWin() && _timer.IsEnabled)
             {
                 MessageBox.Show("You won!");
                 _timer.Stop();
@@ -198,23 +201,19 @@ namespace _8_Puzzle
                 _selectedBitmap.Tag = new Tuple<int, int>(i, j);
                 _cropImage[iblank, jblank] = _selectedBitmap;
                 _cropImage[iold, jold] = null;
-                if (checkWin())
+                if (checkWin() && _timer.IsEnabled)
                 {
                     MessageBox.Show("You won!");
                     _timer.Stop();
                     this.Close();
                 }
-                
+
             }
             else
             {
                 Canvas.SetTop(_selectedBitmap, (int)(iold * (height + 2) + startY));
                 Canvas.SetLeft(_selectedBitmap, (int)(jold * (width + 2) + startX));
             }
-
-            
-            
-            
         }
         private void CropImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -229,7 +228,7 @@ namespace _8_Puzzle
 
             int i = ((int)position.Y - startY) / height;
             int j = ((int)position.X - startX) / width;
-            this.Title = $"{position.X} - {position.Y}, a[{i}][{j}]";
+            //this.Title = $"{position.X} - {position.Y}, a[{i}][{j}]";
             if (_isDragging == true)
             {
                 var dx = position.X - _lastPosition.X;
@@ -291,12 +290,12 @@ namespace _8_Puzzle
         {
             var source = new BitmapImage(new Uri(filename, UriKind.Absolute));
 
-            previewImage.Width = 3 * width;
-            previewImage.Height = 3 * height;
+            previewImage.Width = 4 * width;
+            previewImage.Height = 4 * height;
             previewImage.Source = source;
 
             Canvas.SetLeft(previewImage, 430);
-            Canvas.SetTop(previewImage, 20);
+            Canvas.SetTop(previewImage, 90);
 
             // Bắt đầu cắt thành 9 mảnh
             for (int i = 0; i < 3; i++)
@@ -419,7 +418,7 @@ namespace _8_Puzzle
             lbTimer.Content = $"{_min} : {_sec}";
             if (_decrement == 0)
             {
-                MessageBox.Show("You lose !");
+                MessageBox.Show("You lose!");
                 _timer.Stop();
             }
         }

@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 G:\LINHTINH\Wallpaper\99836.jpg
 13
 4 7 2 0 8 5 3 6 1 
+=======
+C:\Users\sacph\OneDrive\Desktop\71027175_2469656370026527_9070906006426353664_n.jpg
+996
+0 1 4 5 8 7 6 3 2 
+>>>>>>> 4b774a5a59cb3feb768acf06b54a99629a8b1dd2

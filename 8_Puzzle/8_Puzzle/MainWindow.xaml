@@ -5,19 +5,49 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_8_Puzzle"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="Puzzle Game" Height="525" Width="810"
         MouseMove="Window_MouseMove"
-        KeyUp="OnPreviewKeyDown"
-       >
+        KeyUp="OnPreviewKeyDown">
 
     <Canvas x:Name="canvas">
-        <Line X1="300" Y1="30" X2="300" Y2="330" Stroke="Red" StrokeThickness="5"></Line>
-        <Label Content="Preview Image" Canvas.Left="487" Canvas.Top="36"/>
+        <Image Source="imgs/logo.png" Width="244" Height="192" Canvas.Left="33" Canvas.Top="-31"/>
+        <StackPanel Canvas.Left="377" Canvas.Top="13" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image Source="imgs/lighthouse.png" Width="30" ></Image>
+                <Label Content="How To Play" FontFamily="Segoe UI Semibold" FontSize="20" Foreground="#FFE51212" FontWeight="Bold"/>
+            </StackPanel>
+
+            <Label Content="1. Press button Play Game and choose the picture you want to play" FontFamily="Segoe UI Semibold" Foreground="#FF8B5656"/>
+            <Label Content="2. Use Arrow Key or Mouse to move pieces" FontFamily="Segoe UI Semibold" Foreground="#FF8B5656"/>
+            <Label Content="3. If you finish the picture in time , you will win the game" FontFamily="Segoe UI Semibold" Foreground="#FF8B5656"/>
+        </StackPanel>
+
+        <Line X1="260" Y1="30" X2="260" Y2="330" Stroke="#FF35A5DF" StrokeThickness="4" Canvas.Top="131" Canvas.Left="67"></Line>
+        <Label Content="Preview Image" Canvas.Left="522" Canvas.Top="159" FontFamily="Segoe UI Semibold" FontSize="16" Foreground="#FF21437D" Background="#FF82F197"/>
         <Image x:Name="previewImage"/>
-        <Button x:Name="btnPickPicture" Click="btnSelectPicture_Click" Content="Select Picture" RenderTransformOrigin="0.295,-0.038" Canvas.Left="392" Canvas.Top="302"/>
-        <Button x:Name="btnSaveGame" Click="btnSaveGame_Click" Content="Save Game" Canvas.Left="604" Canvas.Top="302" />
-        <Button x:Name="btnLoadGame" Click="btnLoadGame_Click" Content="Load Game" Canvas.Left="503" Canvas.Top="302" />
-        <Label x:Name="lbTimer" Content="00:00" FontSize="20px" RenderTransformOrigin="22.924,1.104" Canvas.Left="572" Canvas.Top="236"/>
-        <Label x:Name="lbTime" Content="Time Left: " FontSize="20px" RenderTransformOrigin="5.884,11.859" Canvas.Left="440" Canvas.Top="236" />
+        <Button x:Name="btnPickPicture" Click="btnSelectPicture_Click"  RenderTransformOrigin="0.295,-0.038" Canvas.Left="390" Canvas.Top="434" FontFamily="Segoe UI Semibold" Height="30" Width="116" >
+            <StackPanel Orientation="Horizontal">
+                <Image Source="imgs/play-station.png" Width="20" Height="20" Margin="0,0,10,0"/>
+                <TextBlock FontSize="16" Foreground="#FF3B0374">Play Game</TextBlock>
+            </StackPanel>
+        </Button>
+        <Button x:Name="btnSaveGame" Click="btnSaveGame_Click" Height="30" Width="116" Canvas.Left="656" Canvas.Top="434" FontFamily="Segoe UI Semibold" >
+            <StackPanel Orientation="Horizontal">
+                <Image Source="imgs/diskette.png" Width="20" Height="20" Margin="0,0,10,0"/>
+                <TextBlock FontSize="16" Foreground="#FF3B0374">Save Game</TextBlock>
+            </StackPanel>
+        </Button>
+        <Button x:Name="btnLoadGame" Click="btnLoadGame_Click" Height="30" Width="116" Canvas.Left="525" Canvas.Top="434" FontFamily="Segoe UI Semibold">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="imgs/puzzle.png" Width="20" Height="20" Margin="0,0,10,0"/>
+                <TextBlock FontSize="16" Foreground="#FF3B0374">Load Game</TextBlock>
+            </StackPanel>
+        </Button>
+        <StackPanel Orientation="Horizontal" Canvas.Top="390" Canvas.Left="498" Background="#FF97F04D">
+            <Image Source="imgs/countdown.png" Width="20"/>
+            <Label x:Name="lbTime" FontSize="16px" Content="Time Left: " RenderTransformOrigin="5.884,11.859" FontFamily="Segoe UI Semibold" Foreground="#FF080668" />
+        </StackPanel>
+        <Label x:Name="lbTimer" Content="00:00" FontSize="20" RenderTransformOrigin="22.924,1.104" Canvas.Left="620" Canvas.Top="387" FontFamily="Segoe UI Semibold" Foreground="#FFF30653"/>
+        <Label Content="mins" Canvas.Left="681" Canvas.Top="395" FontFamily="Segoe UI Semibold"/>
     </Canvas>
 </Window>
